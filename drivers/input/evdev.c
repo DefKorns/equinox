@@ -1007,6 +1007,7 @@ static int evdev_connect(struct input_handler *handler, struct input_dev *dev,
 {
 	struct evdev *evdev;
 	int minor;
+	int free_minor;
 	int error;
 
 	for (minor = 0; minor < EVDEV_MINORS; minor++) {
@@ -1015,6 +1016,8 @@ static int evdev_connect(struct input_handler *handler, struct input_dev *dev,
 		if (!evdev_table[minor])
 			break;
 	}
+
+	free_minor = minor;
 
 	if(dev->dev.parent) {
 		if (!strncmp(dev_name(dev->dev.parent),"1-1.2:",6)) {
@@ -1078,6 +1081,10 @@ static int evdev_connect(struct input_handler *handler, struct input_dev *dev,
 #endif
 
 	}
+
+	/* a pad with two input interfaces maps both to one fixed minor */
+	if (minor < EVDEV_MINORS && evdev_table[minor])
+		minor = free_minor;
 
 	if (minor == EVDEV_MINORS) {
 		pr_err("no more free evdev devices\n");
