@@ -390,6 +390,13 @@ static __s32 usb_script_parse(struct usb_cfg *cfg)
 		}
 	}
 
+#ifdef CONFIG_USB_SUNXI_USB0_OTG
+	/* the factory script.bin pins port 0 to device mode */
+	if (cfg->port[0].detect_type == USB_DETECT_TYPE_VBUS_ID &&
+			cfg->port[0].id.valid)
+		cfg->port[0].port_type = USB_PORT_TYPE_OTG;
+#endif
+
 	return 0;
 }
 
